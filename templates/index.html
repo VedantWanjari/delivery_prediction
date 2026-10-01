@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Food Delivery Predictor</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background: #f6f7fb; }
+    .card { border: 0; border-radius: 18px; }
+    .section-title { font-weight: 700; font-size: 1rem; margin-bottom: 10px; }
+    .small-hint { font-size: 0.85rem; color: #6c757d; }
+    .result-box {
+      background: linear-gradient(135deg, #eef5ff, #f7f9ff);
+      border: 1px solid #dce7ff;
+      border-radius: 16px;
+      padding: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container py-4 py-lg-5">
+    <div class="row justify-content-center">
+      <div class="col-12 col-xl-10">
+        <div class="card shadow-sm p-3 p-lg-4">
+          <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3">
+            <div>
+              <h2 class="mb-1">Food Delivery Predictor</h2>
+              <div class="small-hint">Predict estimated delivery time and late delivery from order details.</div>
+            </div>
+            <button type="button" class="btn btn-outline-secondary" onclick="fillSample()">
+              Fill Sample Values
+            </button>
+          </div>
+
+          <form method="post" action="/predict" class="row g-3" id="predictForm">
+            <div class="col-12">
+              <div class="section-title">Time and date</div>
+            </div>
+
+            <div class="col-md-3">
+              <label class="form-label">Order Hour</label>
+              <input type="number" class="form-control" name="order_hour" min="0" max="23" required>
+            </div>
+
+            <div class="col-md-3">
+              <label class="form-label">Day of Week</label>
+              <select class="form-select" name="day_of_week" required>
+                <option value="">Select</option>
+                {% for d in day_of_week_list %}
+                  <option value="{{ d }}">{{ d }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="col-md-3">
+              <label class="form-label">Is Weekend</label>
+              <select class="form-select" name="is_weekend" required>
+                <option value="0">No</option>
+                <option value="1">Yes</option>
+              </select>
+            </div>
+
+            <div class="col-md-3">
+              <label class="form-label">Order Year</label>
+              <input type="number" class="form-control" name="order_year" min="2000" max="2100" required>
+            </div>
+
+            <div class="col-md-3">
+              <label class="form-label">Order Month</label>
+              <input type="number" class="form-control" name="order_month" min="1" max="12" required>
+            </div>
+
+            <div class="col-md-3">
+              <label class="form-label">Order Day</label>
+              <input type="number" class="form-control" name="order_day" min="1" max="31" required>
+            </div>
+
+            <div class="col-md-3">
+              <label class="form-label">Week of Year</label>
+              <input type="number" class="form-control" name="order_weekofyear" min="1" max="53" required>
+            </div>
+
+            <div class="col-12 mt-2">
+              <div class="section-title">Customer and restaurant</div>
+            </div>
+
+            <div class="col-md-3">
+              <label class="form-label">Customer Age</label>
+              <input type="number" class="form-control" name="customer_age" min="18" max="55" required>
+            </div>
+
+            <div class="col-md-3">
+              <label class="form-label">Customer Type</label>
+              <select class="form-select" name="customer_type" required>
+                <option value="">Select</option>
+                {% for v in customer_types %}
+                  <option value="{{ v }}">{{ v }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="col-md-3">
+              <label class="form-label">Restaurant Type</label>
+              <select class="form-select" name="restaurant_type" required>
+                <option value="">Select</option>
+                {% for v in restaurant_types %}
+                  <option value="{{ v }}">{{ v }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="col-md-3">
+              <label class="form-label">Primary Category</label>
+              <select class="form-select" name="restaurant_primary_category" required>
+                <option value="">Select</option>
+                {% for v in primary_categories %}
+                  <option value="{{ v }}">{{ v }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="col-md-3">
+              <label class="form-label">Restaurant Rating</label>
+              <input type="number" class="form-control" name="restaurant_rating" min="2.8" max="5.0" step="0.1" required>
+            </div>
+
+            <div class="col-md-3">
+              <label class="form-label">Items Count</label>
+              <input type="number" class="form-control" name="items_count" min="1" max="10" required>
+            </div>
+
+            <div class="col-md-3">
+              <label class="form-label">Prep Time (min)</label>
+              <input type="number" class="form-control" name="restaurant_preparation_time_minutes" min="5" max="73" required>
+            </div>
+
+            <div class="col-md-3">
+              <label class="form-label">City</label>
+              <select class="form-select" name="city" id="city" onchange="updateAreas()" required>
+                <option value="">Select</option>
+                {% for c in cities %}
+                  <option value="{{ c }}">{{ c }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="col-md-3">
+              <label class="form-label">Delivery Area</label>
+              <select class="form-select" name="delivery_area" id="delivery_area" required>
+                <option value="">Select city first</option>
+              </select>
+            </div>
+
+            <div class="col-12 mt-2">
+              <div class="section-title">Order amount</div>
+            </div>
+
+            <div class="col-md-3">
+              <label class="form-label">Subtotal</label>
+              <input type="number" class="form-control" name="subtotal" min="0" step="0.01" required>
+            </div>
+
+            <div class="col-md-3">
+              <label class="form-label">Discount Percent</label>
+              <input type="number" class="form-control" name="discount_percent" min="0" max="20" step="0.01" required>
+            </div>
+
+            <div class="col-md-3">
+              <label class="form-label">Tax Amount</label>
+              <input type="number" class="form-control" name="tax_amount" min="0" step="0.01" required>
+            </div>
+
+            <div class="col-md-3">
+              <label class="form-label">Service Fee</label>
+              <input type="number" class="form-control" name="service_fee" min="0" step="0.01" required>
+            </div>
+
+            <div class="col-md-3">
+              <label class="form-label">Delivery Fee</label>
+              <input type="number" class="form-control" name="delivery_fee" min="0" step="0.01" required>
+            </div>
+
+            <div class="col-md-3">
+              <label class="form-label">Order Total</label>
+              <input type="number" class="form-control" name="order_total" min="0" step="0.01" required>
+            </div>
+
+            <div class="col-md-3">
+              <label class="form-label">Tip Amount</label>
+              <input type="number" class="form-control" name="tip_amount" min="0" step="0.01" required>
+            </div>
+
+            <div class="col-md-3">
+              <label class="form-label">Payment Method</label>
+              <select class="form-select" name="payment_method" required>
+                <option value="">Select</option>
+                {% for v in payment_methods %}
+                  <option value="{{ v }}">{{ v }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="col-12 mt-2">
+              <div class="section-title">Delivery conditions</div>
+            </div>
+
+            <div class="col-md-3">
+              <label class="form-label">Distance (km)</label>
+              <input type="number" class="form-control" name="distance_km" min="0.8" max="20" step="0.1" required>
+            </div>
+
+            <div class="col-md-3">
+              <label class="form-label">Weather</label>
+              <select class="form-select" name="weather" required>
+                <option value="">Select</option>
+                {% for v in weather_list %}
+                  <option value="{{ v }}">{{ v }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="col-md-3">
+              <label class="form-label">Traffic Level</label>
+              <select class="form-select" name="traffic_level" required>
+                <option value="">Select</option>
+                {% for v in traffic_list %}
+                  <option value="{{ v }}">{{ v }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="col-md-3">
+              <label class="form-label">Driver Experience (months)</label>
+              <input type="number" class="form-control" name="delivery_partner_experience_months" min="1" max="60" required>
+            </div>
+
+            <div class="col-md-3">
+              <label class="form-label">Driver Rating</label>
+              <input type="number" class="form-control" name="delivery_partner_rating" min="3.2" max="5.0" step="0.1" required>
+            </div>
+
+            <div class="col-12 mt-2">
+              <button type="submit" class="btn btn-primary px-4">Predict</button>
+            </div>
+          </form>
+
+          {% if result %}
+          <div class="result-box mt-4">
+            <h5 class="mb-3">Prediction Result</h5>
+            <div><strong>Estimated Delivery Time:</strong> {{ eta }} minutes</div>
+            <div><strong>Late Delivery Probability:</strong> {{ late_prob }}</div>
+            <div><strong>Late Delivery Prediction:</strong> {{ late_pred }}</div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  
+
+  <script>
+    const AREAS_BY_CITY = {{ areas_by_city | tojson }};
+
+    function updateAreas() {
+      const city = document.getElementById("city").value;
+      const areaSelect = document.getElementById("delivery_area");
+
+      areaSelect.innerHTML = '<option value="">Select</option>';
+
+      if (!city || !AREAS_BY_CITY[city]) return;
+
+      AREAS_BY_CITY[city].forEach(area => {
+        const opt = document.createElement("option");
+        opt.value = area;
+        opt.textContent = area;
+        areaSelect.appendChild(opt);
+      });
+    }
+
+    function setValue(name, value) {
+      const el = document.querySelector(`[name="${name}"]`);
+      if (el) el.value = value;
+    }
+
+    function fillSample() {
+      setValue("order_hour", 19);
+      setValue("day_of_week", "Friday");
+      setValue("is_weekend", 1);
+      setValue("order_year", 2025);
+      setValue("order_month", 10);
+      setValue("order_day", 1);
+      setValue("order_weekofyear", 40);
+
+      setValue("customer_age", 24);
+      setValue("customer_type", "Regular");
+      setValue("restaurant_type", "Fast Food");
+      setValue("restaurant_primary_category", "Burger");
+      setValue("restaurant_rating", 4.4);
+      setValue("items_count", 3);
+      setValue("restaurant_preparation_time_minutes", 22);
+
+      setValue("city", "City_A");
+      updateAreas();
+      setValue("delivery_area", "City_A_Area_3");
+
+      setValue("subtotal", 650);
+      setValue("discount_percent", 10);
+      setValue("tax_amount", 32.5);
+      setValue("service_fee", 15);
+      setValue("delivery_fee", 30);
+      setValue("order_total", 727.5);
+      setValue("tip_amount", 20);
+      setValue("payment_method", "Digital Wallet");
+
+      setValue("distance_km", 6.8);
+      setValue("weather", "Rain");
+      setValue("traffic_level", "High");
+      setValue("delivery_partner_experience_months", 18);
+      setValue("delivery_partner_rating", 4.6);
+    }
+  </script>
+</body>
+</html>
