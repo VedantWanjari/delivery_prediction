@@ -15,16 +15,6 @@ The app takes delivery order details as input and returns:
 
 Deployed app: [https://delivery-prediction-w6w4.onrender.com/](https://delivery-prediction-w6w4.onrender.com/)
 
-## Dataset
-
-This project uses the Kaggle dataset:
-
-[Food Delivery Orders & ETA Logistics Dataset](https://www.kaggle.com/datasets/razanihababdellatif/food-delivery-orders-and-eta-logistics-dataset)
-
-The dataset is licensed under **CC BY 4.0 Attribution 4.0 International**:
-
-[CC BY 4.0 License](https://creativecommons.org/licenses/by/4.0/)
-
 ## Dataset Attribution
 
 This project uses the **Food Delivery Orders & ETA Logistics Dataset**,
