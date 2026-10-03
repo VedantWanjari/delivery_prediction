@@ -25,18 +25,18 @@ The dataset is licensed under **CC BY 4.0 Attribution 4.0 International**:
 
 [CC BY 4.0 License](https://creativecommons.org/licenses/by/4.0/)
 
-## License and Attribution
+## Dataset Attribution
 
-This project uses a dataset licensed under **Creative Commons Attribution 4.0 International (CC BY 4.0)**.
+This project uses the **Food Delivery Orders & ETA Logistics Dataset**,
+published on Kaggle by **Razan Ihab**  
+(Kaggle username: `razanihababdellatif`).
 
-Required attribution:
+Source: [Kaggle dataset](https://www.kaggle.com/datasets/razanihababdellatif/food-delivery-orders-and-eta-logistics-dataset)  
+License stated on the source page: [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/)
 
-* credit the original dataset author
-* include a link to the CC BY 4.0 license
-* indicate if changes were made
-
-This repository acknowledges the original dataset and uses it for training machine learning models.
-If you reuse this project or its trained models, please keep the dataset attribution intact.
+The dataset is not included in this repository. It was used to train the
+machine-learning models. Preprocessing and feature engineering were performed
+for this project. This project is not affiliated with or endorsed by Razan Ihab.
 
 ## Models
 
