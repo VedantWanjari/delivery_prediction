@@ -16,6 +16,7 @@
       border-radius: 16px;
       padding: 16px;
     }
+    footer a { text-decoration: none; }
   </style>
 </head>
 <body>
@@ -253,11 +254,25 @@
             <div><strong>Late Delivery Prediction:</strong> {{ late_pred }}</div>
           </div>
           {% endif %}
+
+          <footer class="text-center text-muted small py-3 mt-4 border-top">
+            <div>
+              Code:
+              <a href="https://github.com/VedantWanjari/delivery_prediction" target="_blank" rel="noopener noreferrer">
+                VedantWanjari/delivery_prediction
+              </a>
+            </div>
+            <div>
+              Live:
+              <a href="https://delivery-prediction-w6w4.onrender.com/" target="_blank" rel="noopener noreferrer">
+                delivery-prediction-w6w4.onrender.com
+              </a>
+            </div>
+          </footer>
         </div>
       </div>
     </div>
   </div>
-  
 
   <script>
     const AREAS_BY_CITY = {{ areas_by_city | tojson }};
